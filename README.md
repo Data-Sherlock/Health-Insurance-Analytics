@@ -1,36 +1,82 @@
-🏥 Healthcare Claims Analytics: Where Is the Money Going?
+<div align="center">
 
-Exposing $514K in payment leakage and engineering a $319K recovery strategy across 449 claims.
+# 🏥 Healthcare Claims Analytics
 
-Show Image
-Show Image
-Show Image
-Show Image
-Show Image
+### *Where Is the Money Going?*
 
-🏢 Business Context
-A regional health insurance company hemorrhaged profitability as claims costs spiraled without visibility into spending drivers. Between January 2023 and June 2024, the organization processed $2.06M in billed claims but paid only 75.20% ($1.55M), leaving $514K in denied/unpaid claims.
-C-Level executives demanded answers: "We are losing money and we want to figure out why!"
-This project delivers a comprehensive analytics platform that identifies cost concentration points, payment inefficiencies, and high-risk members—providing an actionable roadmap to recover $319K annually while improving member satisfaction.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![SQL](https://img.shields.io/badge/SQL-MySQL-orange.svg)](https://www.mysql.com/)
+[![Power BI](https://img.shields.io/badge/Power%20BI-DAX-yellow.svg)](https://powerbi.microsoft.com/)
+[![Status](https://img.shields.io/badge/Status-Complete-success.svg)]()
 
-🛠️ Technical Implementation
-1. Data Engineering (SQL + MySQL)
-Integrated 449 claims across 100 members (15 active) with multi-dimensional analysis. Key technical challenges:
+**Exposing $514K in payment leakage and engineering a $319K recovery strategy across 449 claims**
 
-Hierarchical Aggregation: Bridging member demographics with claims via INNER JOIN while preserving claim-level granularity for CPT/ICD analysis
-Payment Ratio Calculations: Using NULLIF() guards against division-by-zero in payment efficiency metrics across 5 claim types
-Ranking Windows: Leveraging RANK() OVER (ORDER BY SUM(...) DESC) to identify top cost drivers by member, procedure code, and diagnosis
+[View Dashboard](#-dashboard-architecture) • [Explore Insights](#-strategic-insights) • [See Results](#-financial-impact-analysis)
 
-Query Example:
-sql-- Multi-Level Cost Attribution
+---
+
+</div>
+
+## 📋 Table of Contents
+
+- [Business Context](#-business-context)
+- [Technical Implementation](#️-technical-implementation)
+- [Strategic Insights](#-strategic-insights)
+- [Project Deliverables](#-project-deliverables)
+- [Financial Impact](#-financial-impact-analysis)
+- [Executive Action Plan](#-executive-action-plan)
+- [Dashboard Architecture](#-dashboard-architecture)
+- [Repository Structure](#-repository-structure)
+- [Methodology](#-methodology-highlights)
+- [License](#-license)
+
+---
+
+## 🏢 Business Context
+
+A regional health insurance company hemorrhaged profitability as claims costs spiraled without visibility into spending drivers. Between **January 2023** and **June 2024**, the organization:
+
+- 💰 Processed **$2.06M** in billed claims
+- ✅ Paid only **75.20%** ($1.55M)
+- ❌ Left **$514K** in denied/unpaid claims
+
+> **C-Level Demand:** *"We are losing money and we want to figure out why!"*
+
+This project delivers a comprehensive analytics platform that identifies cost concentration points, payment inefficiencies, and high-risk members—providing an actionable roadmap to recover **$319K annually** while improving member satisfaction.
+
+---
+
+## 🛠️ Technical Implementation
+
+### 1. Data Engineering (SQL + MySQL)
+
+Integrated **449 claims** across **100 members** (15 active) with multi-dimensional analysis.
+
+**Key Technical Challenges:**
+
+| Challenge | Solution |
+|-----------|----------|
+| **Hierarchical Aggregation** | Bridging member demographics with claims via `INNER JOIN` while preserving claim-level granularity |
+| **Payment Ratio Calculations** | Using `NULLIF()` guards against division-by-zero in payment efficiency metrics |
+| **Ranking Windows** | Leveraging `RANK() OVER (ORDER BY SUM(...) DESC)` to identify top cost drivers |
+
+**Query Example:**
+
+```sql
+-- Multi-Level Cost Attribution
 WITH member_totals AS (
-    SELECT member_id, SUM(paid_amount) AS total_paid
+    SELECT 
+        member_id, 
+        SUM(paid_amount) AS total_paid
     FROM claims
     GROUP BY member_id
-    ORDER BY total_paid DESC LIMIT 10
+    ORDER BY total_paid DESC 
+    LIMIT 10
 )
 SELECT 
-    m.member_id, m.member_age, m.plan_type,
+    m.member_id, 
+    m.member_age, 
+    m.plan_type,
     c.claim_type,
     SUM(c.paid_amount) AS type_cost,
     ROUND(SUM(c.paid_amount) * 100.0 / mt.total_paid, 2) AS pct_of_member_total
@@ -39,9 +85,14 @@ JOIN claims c ON m.member_id = c.member_id
 JOIN member_totals mt ON m.member_id = mt.member_id
 GROUP BY m.member_id, c.claim_type
 ORDER BY m.member_id, type_cost DESC;
-2. Advanced Analytics (DAX)
-Engineered a Payment Efficiency Index to flag underperforming claim types:
-daxPayment Efficiency Score = 
+```
+
+### 2. Advanced Analytics (DAX)
+
+Engineered a **Payment Efficiency Index** to flag underperforming claim types:
+
+```dax
+Payment Efficiency Score = 
 VAR CurrentRatio = [Avg Paid Ratio]
 VAR BenchmarkRatio = 0.9078  // Lab services benchmark
 VAR VolumeFactor = LOG10([Claim Count])
@@ -56,29 +107,41 @@ RETURN
 
 ## 🔍 Strategic Insights
 
-### **The Emergency Claims Gap**
+### 🚨 The Emergency Claims Gap
 
-Identified **Emergency services** as the critical leverage point (**Priority Score: 76.63%**). Despite representing **$290K (18.8%)** of total spend, emergency claims trail Lab services by **14.15 percentage points** in payment efficiency.
+**Emergency services** identified as critical leverage point with **Priority Score: 76.63%**
 
-**Market Implication:** Emergency coverage is the **#1 insurance purchasing driver**. This gap represents both a cost leak and a competitive vulnerability.
+- 💸 **$290K** (18.8% of total spend)
+- 📉 Trails Lab services by **14.15 percentage points** in payment efficiency
+- ⚠️ **Market Risk:** Emergency coverage is the **#1 insurance purchasing driver**
 
-### **The $85K Procedure**
+> This gap represents both a cost leak and a competitive vulnerability.
+
+### 💊 The $85K Procedure
 
 **CPT Code 12345 + ICD Code A12.3** emerged as the single highest cost driver:
-- **32 claims** (7.1% of volume)
-- **$85,000 paid** (5.5% of total spend)
-- **$2,656 average** vs. $1,500 industry benchmark
 
-**Audit Opportunity:** Coding accuracy review + alternative treatment protocols = **$14.6K annual savings** with 730% ROI.
+```
+┌─────────────────────────────────────┐
+│ 32 claims (7.1% of volume)          │
+│ $85,000 paid (5.5% of total spend)  │
+│ $2,656 avg vs $1,500 benchmark      │
+└─────────────────────────────────────┘
+```
 
-### **Member Cost Concentration**
+**Audit Opportunity:** Coding accuracy review + alternative treatment protocols  
+**Expected Savings:** $14.6K annually | **ROI:** 730%
 
-**Member #6:** $43K spend (**2.88x average**, Rank #1)
+### 👥 Member Cost Concentration
+
+**Member #6:** $43K spend (2.88x average, Rank #1)
+
 - 85% driven by inpatient services
 - Likely chronic condition requiring case management
 - Top 10 members = **21.3% of total costs** from **10% of population**
 
 **Intervention Model:**
+
 ```
 High-Touch Case Management
 ├─ Investment: $30K (Top 10 members)
@@ -86,14 +149,18 @@ High-Touch Case Management
 └─ Annual Savings: $49K-$66K (163-220% ROI)
 ```
 
-### **The Q2 2023 Anomaly**
+### 📊 The Q2 2023 Anomaly
 
 **May 2023** recorded the highest claim activity spike:
-- **$15K billed** (peak month)
-- **$7.5K paid** (50% payment rate)
-- Followed by steep 68% decline through Q3-Q4
 
-**Hypothesis:** Seasonal health event (flu outbreak?) or policy change. Represents capacity planning blind spot.
+| Metric | Value | Impact |
+|--------|-------|--------|
+| Billed Amount | $15K | Peak month |
+| Payment Rate | 50% | Below average |
+| Subsequent Decline | 68% | Through Q3-Q4 |
+
+**Hypothesis:** Seasonal health event (flu outbreak?) or policy change  
+**Implication:** Capacity planning blind spot requiring investigation
 
 ---
 
@@ -111,7 +178,7 @@ High-Touch Case Management
 
 ## 💰 Financial Impact Analysis
 
-### **The $319K Recovery Roadmap**
+### The $319K Recovery Roadmap
 
 **Scenario:** Elevate all claim types to Lab's 90.78% benchmark payment rate
 
@@ -120,15 +187,15 @@ High-Touch Case Management
 | Inpatient | 73.88% | **-16.90%** | $1,090,000 | **+$249,015** |
 | Emergency | 76.63% | **-14.15%** | $290,000 | **+$53,148** |
 | Outpatient | 80.30% | **-10.48%** | $130,000 | **+$17,064** |
-| **TOTAL** | | | | **+$319,227** |
+| **TOTAL** | — | — | — | **+$319,227** |
 
-**Realistic Target:** 85% payment rate across all types = **$145K year-1 recovery** (conservative)
+> **Realistic Target:** 85% payment rate across all types = **$145K year-1 recovery** (conservative)
 
 ---
 
 ## 🚀 Executive Action Plan
 
-### **Phase 1: Immediate Interventions (0-30 Days)**
+### Phase 1: Immediate Interventions (0-30 Days)
 
 | Priority | Action | Investment | Annual Return | ROI |
 |:---------|:-------|:-----------|:--------------|:----|
@@ -140,7 +207,7 @@ High-Touch Case Management
 
 ---
 
-### **Phase 2: Process Optimization (1-3 Months)**
+### Phase 2: Process Optimization (1-3 Months)
 
 | Priority | Action | Investment | Annual Return | Timeline |
 |:---------|:-------|:-----------|:--------------|:---------|
@@ -152,56 +219,69 @@ High-Touch Case Management
 
 ---
 
-### **Phase 3: Strategic Transformation (3-12 Months)**
+### Phase 3: Strategic Transformation (3-12 Months)
 
-1. **Predictive Member Risk Model**
-   - ML-based early identification of high-cost trajectories
-   - Investment: $75K | Return: $232K-$310K annually (**309-413% ROI**)
+#### 1. Predictive Member Risk Model
+- ML-based early identification of high-cost trajectories
+- **Investment:** $75K | **Return:** $232K-$310K annually | **ROI:** 309-413%
 
-2. **Provider Network Optimization**
-   - Renegotiate/remove bottom 20% payment performers
-   - Investment: $50K | Return: $77K-$124K annually (**154-248% ROI**)
+#### 2. Provider Network Optimization
+- Renegotiate/remove bottom 20% payment performers
+- **Investment:** $50K | **Return:** $77K-$124K annually | **ROI:** 154-248%
 
-3. **Preventive Wellness Programs**
-   - Reduce 75% of member base costs by 5-8%
-   - Investment: $100K | Return: $77K-$124K annually (**77-124% ROI**)
+#### 3. Preventive Wellness Programs
+- Reduce 75% of member base costs by 5-8%
+- **Investment:** $100K | **Return:** $77K-$124K annually | **ROI:** 77-124%
 
-**Year 1 Total Investment:** $225K  
-**Year 1 Total Recovery:** $386K-$558K  
-**Year 1 Net ROI:** **172-248%**  
-**Year 2+ ROI:** **386-558%** (no reinvestment needed)
+---
+
+### 📈 Year 1 Financial Summary
+
+```
+Total Investment:  $225K
+Total Recovery:    $386K-$558K
+Net ROI Year 1:    172-248%
+Year 2+ ROI:       386-558% (no reinvestment needed)
+```
 
 ---
 
 ## 🎯 Stakeholder Requirements: Fully Addressed
 
-### ✅ **"Which claim types are most expensive?"**
+<details>
+<summary><b>✅ "Which claim types are most expensive?"</b></summary>
 
 **Answer:** Inpatient care dominates at **$1.09M (70.8% of spend)** but suffers from **lowest payment efficiency (73.88%)**—a dangerous combination requiring immediate intervention.
 
----
+</details>
 
-### ✅ **"Which CPT and ICD codes drive highest spending?"**
+<details>
+<summary><b>✅ "Which CPT and ICD codes drive highest spending?"</b></summary>
 
 **Answer:** **CPT 12345 + ICD A12.3** generates **$85K (5.5% of total)** from just 32 claims (**$2,656 avg**). This single code pair represents the largest audit opportunity with **$14.6K annual savings potential**.
 
----
+</details>
 
-### ✅ **"Which members cost the most?"**
+<details>
+<summary><b>✅ "Which members cost the most?"</b></summary>
 
 **Answer:** **Top 10 members (10% of population) account for $328K (21.3% of total costs)**. Member #6 alone costs **$43K**—2.88x the average. Implementing case management for this cohort yields **$49K-$66K savings** (163-220% ROI).
 
----
+</details>
 
-### ✅ **"How do billed vs paid amounts compare?"**
+<details>
+<summary><b>✅ "How do billed vs paid amounts compare?"</b></summary>
 
 **Answer:** **$514K (24.80%) remains unpaid** across all claims. Payment rates vary wildly by claim type (73.88%-90.78%), with Lab services setting the benchmark. Closing this gap to 85% across all types recovers **$145K annually**.
+
+</details>
 
 ---
 
 ## 📈 Dashboard Architecture
 
-### **Power BI Data Model**
+### Power BI Data Model
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                   SEMANTIC LAYER (DAX)                       │
@@ -230,21 +310,22 @@ High-Touch Case Management
 └──────────────────────────────────────────────────────────────┘
 ```
 
-### **Interactive Capabilities**
+### Interactive Capabilities
 
-- **Drill-Through:** Click any member → view full claim history breakdown
-- **Cross-Filtering:** Select claim type → all visuals auto-filter
-- **Dynamic Tooltips:** Hover over any data point → see payment rate, denial %, benchmark comparison
-- **Export Ready:** All tables exportable to Excel for offline analysis
+- 🔍 **Drill-Through:** Click any member → view full claim history breakdown
+- 🎛️ **Cross-Filtering:** Select claim type → all visuals auto-filter
+- 💡 **Dynamic Tooltips:** Hover over any data point → see payment rate, denial %, benchmark comparison
+- 📊 **Export Ready:** All tables exportable to Excel for offline analysis
 
 ---
 
-## 📚 Repository Structure
+## 📁 Repository Structure
+
 ```
 healthcare-claims-analytics/
 │
 ├── 📄 README.md                          ← You are here
-├── 📄 LICENSE (MIT)
+├── 📄 LICENSE
 │
 ├── 📁 data/
 │   ├── schema/
@@ -280,27 +361,40 @@ healthcare-claims-analytics/
     ├── methodology.md                    ← Analytical approach
     ├── technical_architecture.md         ← System design
     └── stakeholder_requirements.md       ← Requirements mapping
+```
 
-🎓 Methodology Highlights
-1. Cost Attribution Framework
+---
+
+## 🎓 Methodology Highlights
+
+### 1. Cost Attribution Framework
+
 Applied activity-based costing principles to allocate spending:
 
-Member-level: Total paid per individual
-Service-level: Claim type contribution %
-Procedure-level: CPT/ICD combination impact
+- **Member-level:** Total paid per individual
+- **Service-level:** Claim type contribution %
+- **Procedure-level:** CPT/ICD combination impact
 
-2. Payment Efficiency Benchmarking
+### 2. Payment Efficiency Benchmarking
+
 Established Lab services (90.78%) as internal gold standard. All other claim types measured against this benchmark to quantify performance gaps.
-3. Risk Stratification Model
+
+### 3. Risk Stratification Model
+
 Segmented 100 members into tiers:
 
-High-Risk: Top 10 (>$28K spend) → Intensive case management
-Medium-Risk: Next 15 ($15K-$28K) → Care coordination
-Low-Risk: Remaining 75 (<$15K) → Preventive wellness
+| Tier | Criteria | Count | Strategy |
+|------|----------|-------|----------|
+| **High-Risk** | Top 10 (>$28K spend) | 10 | Intensive case management |
+| **Medium-Risk** | Next 15 ($15K-$28K) | 15 | Care coordination |
+| **Low-Risk** | Remaining (<$15K) | 75 | Preventive wellness |
 
-4. Temporal Pattern Recognition
-Used LAG() window functions to detect anomalies:
-sqlWITH monthly_metrics AS (
+### 4. Temporal Pattern Recognition
+
+Used `LAG()` window functions to detect anomalies:
+
+```sql
+WITH monthly_metrics AS (
     SELECT 
         DATE_FORMAT(claim_date, '%Y-%m') AS month,
         SUM(billed_amount) AS billed,
@@ -315,34 +409,56 @@ SELECT
     ROUND((billed - prev_billed) / prev_billed * 100, 2) AS mom_change_pct
 FROM monthly_metrics
 WHERE ABS((billed - prev_billed) / prev_billed) > 0.30; -- Flag >30% swings
+```
 
-🔬 Key SQL Patterns Used
-PatternUse CaseExampleWindow FunctionsCost ranking, trend analysisRANK() OVER (PARTITION BY claim_type ORDER BY paid_amount DESC)CTEsMulti-step aggregationsWITH member_totals AS (...)Conditional AggregationCategory-specific metricsSUM(CASE WHEN claim_type = 'inpatient' THEN paid_amount END)NULLIF GuardsSafe division operationspaid_amount / NULLIF(billed_amount, 0)Date FunctionsTemporal groupingDATE_FORMAT(claim_date, '%Y-%m')
+---
 
-💡 Why This Project Stands Out
+## 🔬 Key SQL Patterns Used
 
-Business-First Framing: Leads with stakeholder pain points, not technology
-Quantified Impact: Every insight tied to dollar amounts and ROI
-Actionable Roadmap: Not just "what" but "so what" and "now what"
-Healthcare Domain Expertise: Understands CPT/ICD codes, claim adjudication, case management
-Full-Stack Implementation: Database → Analytics → Visualization → Strategy
-Reproducible Methodology: All queries documented, data model clear, approach transferable
+| Pattern | Use Case | Example |
+|---------|----------|---------|
+| **Window Functions** | Cost ranking, trend analysis | `RANK() OVER (PARTITION BY claim_type ORDER BY paid_amount DESC)` |
+| **CTEs** | Multi-step aggregations | `WITH member_totals AS (...)` |
+| **Conditional Aggregation** | Category-specific metrics | `SUM(CASE WHEN claim_type = 'inpatient' THEN paid_amount END)` |
+| **NULLIF Guards** | Safe division operations | `paid_amount / NULLIF(billed_amount, 0)` |
+| **Date Functions** | Temporal grouping | `DATE_FORMAT(claim_date, '%Y-%m')` |
 
+---
 
-📞 Project Author
-[Your Name]
+## 💡 Why This Project Stands Out
+
+- ✅ **Business-First Framing:** Leads with stakeholder pain points, not technology
+- ✅ **Quantified Impact:** Every insight tied to dollar amounts and ROI
+- ✅ **Actionable Roadmap:** Not just "what" but "so what" and "now what"
+- ✅ **Healthcare Domain Expertise:** Understands CPT/ICD codes, claim adjudication, case management
+- ✅ **Full-Stack Implementation:** Database → Analytics → Visualization → Strategy
+- ✅ **Reproducible Methodology:** All queries documented, data model clear, approach transferable
+
+---
+
+## 📞 Contact
+
+**[Your Name]**  
 Healthcare Data Analyst | SQL + Power BI Specialist
 
-📧 Email: your.email@example.com
-💼 LinkedIn: linkedin.com/in/yourprofile
-🌐 Portfolio: yourportfolio.com
+📧 **Email:** your.email@example.com  
+💼 **LinkedIn:** [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)  
+🌐 **Portfolio:** [yourportfolio.com](https://yourportfolio.com)
 
+---
 
-📄 License
-This project is licensed under the MIT License - see LICENSE file for details.
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
 
 <div align="center">
-🏥 Built to answer: "Where is the money going?"
-Exposing $514K in leakage • Engineering $319K in recovery
-⬆ Back to Top
+
+### 🏥 Built to answer: *"Where is the money going?"*
+
+**Exposing $514K in leakage • Engineering $319K in recovery**
+
+[![⬆ Back to Top](#-healthcare-claims-analytics)](#)
+
 </div>
