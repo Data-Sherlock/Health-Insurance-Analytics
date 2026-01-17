@@ -438,20 +438,14 @@ WHERE ABS((billed - prev_billed) / prev_billed) > 0.30; -- Flag >30% swings
 
 ## 📞 Contact
 
-**[Your Name]**  
-Healthcare Data Analyst | SQL + Power BI Specialist
+**[AHmed Rafi]**  
+ Data Analyst | SQL + Power BI Specialist
 
-📧 **Email:** your.email@example.com  
+📧 **Email:** ahmedrafi.analytics@gmail.com
 💼 **LinkedIn:** [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)  
-🌐 **Portfolio:** [yourportfolio.com](https://yourportfolio.com)
 
----
 
-## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
 
 <div align="center">
 
