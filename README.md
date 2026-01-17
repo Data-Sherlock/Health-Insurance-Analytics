@@ -4,7 +4,7 @@
 
 ### *Where Is the Money Going?*
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 [![SQL](https://img.shields.io/badge/SQL-MySQL-orange.svg)](https://www.mysql.com/)
 [![Power BI](https://img.shields.io/badge/Power%20BI-DAX-yellow.svg)](https://powerbi.microsoft.com/)
 [![Status](https://img.shields.io/badge/Status-Complete-success.svg)]()
