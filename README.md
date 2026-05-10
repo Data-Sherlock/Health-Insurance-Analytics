@@ -106,6 +106,7 @@ RETURN
 ---
 
 ## 🔍 Strategic Insights
+![Image Alt](https://github.com/Data-Sherlock/Health-Insurance-Analytics/blob/36c2a895543b4e94884f434f68e7b165adecaf6c/Health%20Insurance%20Analytics.png)
 
 ### 🚨 The Emergency Claims Gap
 
